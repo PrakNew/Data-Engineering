@@ -1,0 +1,109 @@
+For partitioning, we have to increase partitions and enable the dynamic partition
+ 
+
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions=1000;
+set hive.exec.max.dynamic.partitions.pernode=1000;
+ 
+
+Create an external table and partition over year and month
+create external table if not exists amz_review_yr_mnth_part (
+    reviewerid string, 
+    asin string, 
+    reviewername string, 
+    helpful array<int>, 
+    reviewtext string,
+    overall double, 
+    summary string, 
+    unixreviewtime bigint) partitioned by
+(yr int, mnth int)
+location 's3a://<your-bucket-name>/folder-name'
+ 
+
+Note: We are using year and months for partitioning, because these columns have minimum cardinality.
+
+ 
+
+
+
+Insert data into amz_review_yr_mnth_part from amz_review_col
+insert overwrite table amz_review_yr_mnth_part partition(yr, mnth)
+select    reviewerid,
+          asin,
+          reviewername,
+          helpful,
+          reviewtext,
+          overall,
+          summary,
+          unixreviewtime,
+          year(from_unixtime(unixreviewtime)) as yr,
+          month(from_unixtime(unixreviewtime)) as mnth
+from      amz_review_col
+ 
+
+Execute both queries to get execution time difference with and without partition.
+select  overall, count(*) as review_count from amz_review_yr_mnth_part
+where  yr = 2004 and mnth = 1  group by overall   order by review_count desc;
+ 
+
+select  overall,  count(*) as review_count from amz_review_col
+where year(from_unixtime(unixreviewtime)) = 2004 and month(from_unixtime(unixreviewtime)) = 1
+ group by overall order by review_count desc;
+ 
+
+Now, let's see how we can use the HQL Rank functions in our analysis.
+
+
+#---------------------------------------------------------------------
+Using RANK() function
+Select asin as Product , RANK() OVER(order by overall)  from amz_review_yr_mnth_part 
+ 
+
+If we want consecutive ranking - we have to use DENSE_RANK() function
+Select asin as Product , DENSE_RANK() OVER(order by overall)  from amz_review_yr_mnth_part 
+
+
+#---------------------------------------------------------------------
+
+Now you get an essence of how execution time gets affected by partitioning and bucketing.
+
+ 
+
+Let's conclude some important points of the above video:
+
+
+For doing bucketing we have to execute the following command:
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.dynamic.partition=true;
+set hive.enforce.bucketing=true;
+set hive.exec.max.dynamic.partitions=1000;
+set hive.exec.max.dynamic.partitions.pernode=1000;
+ 
+
+Note: we will use reviewerid for bucketing as each reviewer has a unique id. (The cardinality is very minimum here.)
+
+ 
+
+Create an external table with bucketing 
+create external table if not exists
+amz_review_clustered_yr_mnth
+(reviewerid string, asin string, reviewername string, helpful
+array<int>, reviewtext string,
+overall double, summary string, unixreviewtime bigint) partitioned by
+(yr int, mnth int)
+clustered by (reviewerid) into 4 buckets
+location 's3a://hue-demo-bucket/tables'
+ 
+
+After successful creation of the external table, insert data into it.
+insert overwrite table
+amz_review_clustered_yr_mnth partition(yr,
+mnth)
+select reviewerid, asin, reviewername, helpful, reviewtext,
+overall, summary, unixreviewtime, yr, mnth
+from amz_review_yr_mnth_part
+ 
+
+As a practice, you can compare the execution time of the different queries between the amz_review (doesn't have partitioning and bucketing) and amz_review_clustered_yr_mnth (Has partitioning and bucketing). 
+
