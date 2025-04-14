@@ -1,3 +1,5 @@
+#NOTE: This can also run from HUE interface as well as Hive CLI
+
 Create an external table with name amz_review_dataset and load data into it
 create external table amz_review.amz_review_dump (json_dump string)  
 location 's3a://<your_bucket_name>/tables/';
