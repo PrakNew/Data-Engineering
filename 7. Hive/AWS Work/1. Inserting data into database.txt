@@ -1,0 +1,22 @@
+Load Amazon reviews data into Bucket using EC2 instance using below command.
+
+aws s3 cp s3://hivedata-bde/Electronics_5.json s3://yourbucketname/yourfoldername/
+ 
+
+Verify whether the data set has been copied to your bucket.
+
+aws s3 ls s3://yourbucketname/yourfoldername/
+
+ 
+
+Create database amz_review and before that check whether the database is present or not
+Run this command to add SerDe jar.
+Add jar /usr/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-2.3.6-amzn-2.jar;
+ 
+
+For further analysis, you have to create a separate database:
+create database amz_review;
+Show databases;
+ 
+
+In the next segment, you will see the steps to create the External table for data analysis
