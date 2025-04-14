@@ -1,0 +1,26 @@
+Create an external table with name amz_review_dataset and load data into it
+create external table amz_review.amz_review_dump (json_dump string)  
+location 's3a://<your_bucket_name>/tables/';
+Verify whether data is loaded into the table.
+select * from amz_review.amz_review_dump limit 10;
+To add the data into different columns, run:
+create external table amz_review.amz_review_col (
+    reviewerid string,
+    asin string,
+    reviewername string,
+    helpful array<int>,
+    reviewtext string,
+    overall double,
+    summary string,
+    unixreviewtime bigint)
+    row format serde 'org.apache.hive.hcatalog.data.JsonSerDe'
+    with serdeproperties ('paths'= '')
+    location 's3a://<your bucket name> /tables/';
+ 
+
+
+Verify data on the table.
+Select * from amz_review.amz_review_col limit 5;
+ 
+
+In the next segment, we will start with a generic analysis of the 'amazon review' dataset.
