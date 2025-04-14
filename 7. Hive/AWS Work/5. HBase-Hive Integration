@@ -1,0 +1,39 @@
+Add the Hive Catalog jar file, which defines JSON serde to read a JSON file.
+Add jar /usr/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-2.3.6-amzn-2.jar;
+ 
+
+Note: you have to give permission in HBase to create a base table. Run the following command in hbase shell:
+
+grant 'hue' ,'RWCA'
+Create an external table of the Amazon review dataset, using the same command as before.
+create external table amz_review.amz_review_col (
+    reviewerid string,
+    asin string,
+    reviewername string,
+    helpful array<int>,
+    reviewtext string,
+    overall double,
+    summary string,
+    unixreviewtime bigint)
+    row format serde 'org.apache.hive.hcatalog.data.JsonSerDe'
+    with serdeproperties ('paths'= '')
+    location 's3a://<your bucket name> /tables/';
+Create the Map table, one on Hive(amazon_hbase) and one on HBase(amazon_hive), These two tables will have their columns mapped.
+create table amazon_hbase(`reviewerid` string, `asin` string, `summary` string)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key,cf1:asin,cf1:summary")
+TBLPROPERTIES ("hbase.table.name" = "amazon_hive");
+
+Now, any data which is inserted to the amazon_hbase(on Hive) table will be also be inserted into amazon_hive(on HBase) table.
+insert overwrite table amazon_hbase 
+<HQL query>;
+
+For example, the following command inserts 10 entries from reviewerid, asin and summary column to the amazon_hbase table.
+insert overwrite table amazon_hbase 
+select amz_review_col.reviewerid, amz_review_col.asin, amz_review_col.summary 
+from amz_review_col LIMIT 10;
+ 
+
+You can also check the inserted data in the HBase table amazon_hive.
+scan 'amazon_hive'
+ 
