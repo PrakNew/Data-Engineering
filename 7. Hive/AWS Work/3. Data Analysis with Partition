@@ -1,0 +1,104 @@
+COUNT
+
+
+In the process let’s also compare the execution time between COUNT(*) and COUNT(1).
+
+ 
+
+Run the two queries below and self-analyse which one is optimal.
+
+Select count(*) from amz_review_col;  
+Select count(1) from amz_review_col; 
+ 
+
+
+COUNT (*) means to traverse all rows and columns of the table, whereas using COUNT(1) means one column and all rows. That's why there is a difference in execution time.
+
+ 
+
+
+Here we have 16,89,188 records. For fetching these many records you will get a slight difference in time of execution.
+
+ 
+
+
+How many unique products are there?
+
+Select count (distinct asin) am_products from amz_review_col;
+ 
+
+
+We will get 63,001 unique products in the data set. 
+
+ 
+
+How many reviews are posted on a yearly basis?
+
+Select rate_year , count(1) cnt from (
+Select year(from_unixtime(unixreviewtime)) rate_year from amz_review_col )T group by rate_year order by rate_year desc;
+Reviews per year
+Reviews per year
+ 
+
+
+After getting a count of reviews posted, Let's find out which product has the maximum and minimum review. 
+
+#-------------------------------------------------------------------------------------------------------------------------------
+AGGREGATION
+After getting a count of reviews posted, let's find out which products have the maximum and minimum reviews.
+
+
+ 
+
+Product with maximum  review 
+
+Select amz_product , max(review_cnt) max_r_cnt from (
+Select asin amz_product,count(1) review_cnt from amz_review_col group
+by asin)T group by amz_product order by max_r_cnt desc limit 1;
+ 
+Product with minimum review 
+
+
+Select amz_product , min(review_cnt) min_r_cnt from (
+Select asin amz_product,count(1) review_cnt from amz_review_col group by asin
+)T group by amz_product order by min_r_cnt asc limit 1;
+ 
+
+We can also execute the following query based on helpful ratings by reviewers:
+
+
+ 
+
+For a maximum helpful review 
+
+Select product , sum(help_rate) as help_rt from (
+Select asin product , CASE WHEN helpful[0]=0 then 0.00 else 
+ROUND(helpful[0]/helpful[1],2) end as help_rate FROM amz_review_col)T 
+group by product order by help_rt desc limit 10;
+
+For a minimum helpful review
+
+
+Select product , sum(help_rate) as help_rt from (
+Select asin product , CASE WHEN helpful[0]=0 then 0.00 else 
+ROUND(helpful[0]/helpful[1],2) end as help_rate FROM amz_review_col)T 
+group by product order by help_rt asc limit 10;
+ 
+
+AVERAGE
+For average review
+
+Select amz_product , avg(review_cnt) max_r_cnt from (
+Select asin amz_product,count(1) review_cnt from amz_review_col group by asin
+)T group by amz_product
+ 
+
+So, you have an idea about how we can do data analysis using Hive.
+
+ 
+
+For practice, we highly recommend you to apply the EDA techniques on the dataset and share your insights on the DF.
+
+ 
+
+In the next segment, you will learn how Partitioning and Bucketing reduce execution time.
