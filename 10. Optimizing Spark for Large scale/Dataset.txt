@@ -1,0 +1,7 @@
+# This is the sample dataset for test 
+wget https://ds-optimizing-spark.s3.amazonaws.com/reviews.py
+wget https://ds-optimizing-spark.s3.amazonaws.com/u.data
+wget https://ds-optimizing-spark.s3.amazonaws.com/u.item
+wget https://ds-optimizing-spark.s3.amazonaws.com/music_streaming_data
+wget https://ds-optimizing-spark.s3.amazonaws.com/Electronics_5.json
+wget https://ds-optimizing-spark.s3.amazonaws.com/1500000+Sales+Records.csv
