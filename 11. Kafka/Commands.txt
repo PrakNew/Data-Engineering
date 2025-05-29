@@ -1,0 +1,44 @@
+Once the Kafka server is up and running, we can start creating topics and producing/consuming messages.
+
+# Commands for starting Kafka server
+
+1. Start Zookeeper
+2. Start Kafka Server
+
+Command to start Zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+Command to start Kafka Server
+bin/kafka-server-start.sh config/server.properties
+
+# Once this is done we can create topics 
+
+>
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
+
+# To list all topics
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+
+# To describe a topic
+bin/kafka-topics.sh --describe --bootstrap-server localhost:9092 --topic test
+
+# To delete a topic
+bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic test
+
+# To produce messages
+bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic test
+
+# To consume messages
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+
+# To produce messages from a file
+bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic test --property parse.key=true --property key.separator=,
+
+# To consume messages from a file
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --property parse.key=true --property key.separator=,
+
+# To produce messages from a file
+bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic test --property parse.key=true --property key.separator=,
+
+# To consume messages from a file
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning --property parse.key=true --property key.separator=,
