@@ -1,0 +1,62 @@
+# Documentation
+https://docs.google.com/document/d/e/2PACX-1vTMjRMCWh1vhCckXr6it9e4vjOKQCD6oCkBOIT0quDSFcZefNlEQI87o1N_GdjEywvQp2nR3heO4qdZ/pub
+
+# Main Notes
+
+In the previous segment, you understood what Kafka Connect is and some of its key concepts. In this segment, you will learn how to fetch data from Twitter and store it inside a Kafka topic named twitter.
+
+ 
+
+Follow the steps mentioned in the document attached here to create a developer account and the twitter app if not done already.
+
+Before proceeding, you need to start the EC2 instance and log in to the instance. Next, you need to start the zookeeper and the Kafka server and create a topic named 'twitter'. Enter the following commands to complete these steps:
+
+ 
+
+From your EC2 instance's home directory,  go into the Kafka folder, enter the following command.
+
+ 
+
+cd downloads/kafka_2.12-2.3.0/
+ 
+
+Once you are inside the folder, you need to start the zookeeper server. You can enter the following command to start it:
+ 
+
+bin/zookeeper-server-start.sh  config/zookeeper.properties
+ 
+
+Next, you need to open a new terminal window and log in to the EC2 instance and go to the Kafka folder again. Inside the folder, you need to run the following command to start the Kafka server:
+
+ 
+
+bin/kafka-server-start.sh config/server.properties
+ 
+
+Now you need to create a topic named twitter. You can do the same by entering the following command:
+
+ 
+
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic twitter
+ 
+
+After completing all the steps, you can watch the next video. The Jupyter Notebooks used in the demonstration are attached below.
+
+
+
+Before running the below code you need to install the following Python packages in your EC2 instance: 
+
+pip install kafka-python
+pip install python-twitter
+pip install tweepy
+ 
+
+In the notebook named Kafka Connect Example, you need to enter the Twitter credentials before running the notebook.
+
+ 
+
+In the variable named access_token, enter your access token and in the variable named access_token_secret, enter the access token secret which you got from Twitter. Next, in the variable named consumer_key, you need to enter the API key and in a variable named consumer_secret, you need to enter API Key Secret. Once you have entered these credentials you will be able to run the notebook successfully.
+
+ 
+
+Note: The Twitter credentials have been blurred in the video below for security reasons.
